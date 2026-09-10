@@ -1,0 +1,14 @@
+{
+  "name": "online-judge",
+  "private": true,
+  "workspaces": [
+    "packages/*"
+  ],
+  "scripts": {
+    "dev:api": "bun run --filter api dev",
+    "dev:worker": "bun run --filter judge-worker dev",
+    "dev:web": "bun run --filter web dev",
+    "db:generate": "bun run --filter api db:generate",
+    "db:migrate": "bun run --filter api db:migrate"
+  }
+}

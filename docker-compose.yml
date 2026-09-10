@@ -1,0 +1,85 @@
+# Start : docker compose up -d
+# Stop  : docker compose down
+# See what are running : docker compose ps
+# See Redis logs : docker compose logs redis 
+
+# Mainly i want : { Postgres , Redis , RedPanda , minio }
+
+services:
+  postgres:
+    image: postgres:16-alpine
+    environment:
+      POSTGRES_DB: online_judge
+      POSTGRES_USER: oj
+      POSTGRES_PASSWORD: oj_secret
+    ports:
+      - "5432:5432"
+    volumes:
+      - pgdata:/var/lib/postgresql/data
+    healthcheck:
+      test: [ "CMD-SHELL", "pg_isready -U oj -d online_judge" ]
+      interval: 5s
+      timeout: 3s
+      retries: 5
+
+  redis:
+    image: redis:7-alpine
+    ports:
+      - "6379:6379"
+    command: redis-server --maxmemory 256mb --maxmemory-policy allkeys-lru
+    healthcheck:
+      test: [ "CMD", "redis-cli", "ping" ]
+      interval: 5s
+      timeout: 3s
+      retries: 5
+
+  redpanda:
+    # Redpanda = Kafka-compatible but simpler to run locally (no Zookeeper)
+    image: redpandadata/redpanda:latest
+    command:
+      - redpanda
+      - start
+      - --smp 1
+      - --memory 512M
+      - --overprovisioned
+      - --kafka-addr PLAINTEXT://0.0.0.0:29092,OUTSIDE://0.0.0.0:9092
+      - --advertise-kafka-addr PLAINTEXT://redpanda:29092,OUTSIDE://localhost:9092
+    ports:
+      - "9092:9092" # Kafka API
+      - "9644:9644" # Admin API
+    healthcheck:
+      test: [ "CMD", "rpk", "cluster", "health" ]
+      interval: 10s
+      timeout: 5s
+      retries: 5
+
+  redpanda-console:
+    # Web UI to see your Kafka topics and messages — very useful for debugging
+    image: redpandadata/console:latest
+    ports:
+      - "8080:8080"
+    environment:
+      KAFKA_BROKERS: redpanda:29092
+    depends_on:
+      - redpanda
+
+  minio:
+    image: minio/minio
+    command: server /data --console-address ":9001"
+    ports:
+      - "9000:9000" # S3 API
+      - "9001:9001" # Web console
+    environment:
+      MINIO_ROOT_USER: minioadmin
+      MINIO_ROOT_PASSWORD: minioadmin
+    volumes:
+      - miniodata:/data
+    healthcheck:
+      test: [ "CMD", "mc", "ready", "local" ]
+      interval: 10s
+      timeout: 5s
+      retries: 5
+
+volumes:
+  pgdata:
+  miniodata:

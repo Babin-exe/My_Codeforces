@@ -1,0 +1,11 @@
+{
+  "name": "@oj/judge-worker",
+  "version": "0.0.1",
+  "private": true,
+  "scripts": {
+    "dev": "bun --watch src/index.ts"
+  },
+  "dependencies": {
+    "@oj/shared": "workspace:*"
+  }
+}
