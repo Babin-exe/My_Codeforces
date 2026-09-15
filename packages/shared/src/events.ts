@@ -46,7 +46,6 @@ export interface SubmissionCreatedEvent
     executionConfig: EventExecutionConfig;
 };
 
-
 export interface SubmissionJudgedEvent
     extends BaseEvent<"SUBMISSION_JUDGED"> {
 
@@ -73,9 +72,6 @@ export interface SubmissionJudgedEvent
     exitCode: number | null;
     signal: string | null;
 };
-
-
-
 
 export interface RejudgeRequestedEvent extends BaseEvent<"REJUDGE_REQUESTED"> {
     type: "REJUDGE_REQUESTED";
