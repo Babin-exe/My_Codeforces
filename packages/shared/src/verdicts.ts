@@ -1,7 +1,3 @@
-/* 
-This is the verdict that i will be using everywhere , api , workers , frotend etc etc 
-*/
-
 export const VERDICTS = {
     ACCEPTED: "ACCEPTED",
     RUNNING: "RUNNING",
@@ -19,16 +15,8 @@ export const VERDICTS = {
 
 export type Verdict = (typeof VERDICTS)[keyof typeof VERDICTS];
 
-
-
-/* 
-Now there can be multiple transition between verdicts 
-like user clicks submit : pending -> compiling -> accepted 
-or pending -> compiling -> Time limit exceed  so lets define some valid transitions 
-*/
-
 export const VALID_TRANSITIONS: Record<Verdict, Verdict[]> = {
-    PENDING: [VERDICTS.COMPILING, VERDICTS.CANCELLED],
+    PENDING: [VERDICTS.COMPILING, VERDICTS.RUNNING, VERDICTS.CANCELLED, VERDICTS.INTERNAL_ERROR],
     COMPILING: [VERDICTS.COMPILATION_ERROR, VERDICTS.RUNNING, VERDICTS.INTERNAL_ERROR, VERDICTS.CANCELLED],
     RUNNING: [VERDICTS.ACCEPTED, VERDICTS.WRONG_ANSWER, VERDICTS.TIME_LIMIT_EXCEEDED, VERDICTS.MEMORY_LIMIT_EXCEEDED,
     VERDICTS.CANCELLED, VERDICTS.RUNTIME_ERROR, VERDICTS.INTERNAL_ERROR],
@@ -42,17 +30,9 @@ export const VALID_TRANSITIONS: Record<Verdict, Verdict[]> = {
     INTERNAL_ERROR: [VERDICTS.PENDING],
 };
 
-
-
-/* Check whether `to` is a valid immediate next state after `from`. */
 export function isValidTransition(from: Verdict, to: Verdict): boolean {
     return (VALID_TRANSITIONS[from]?.includes(to)) ?? false;
 };
-
-
-
-/* Pending -> compilation -> Running -> all other stuffs  */
-/*  we in the last state now   */
 
 const activeVerdicts: Verdict[] = [
     VERDICTS.PENDING,
