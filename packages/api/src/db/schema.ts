@@ -121,10 +121,27 @@ testcase_count INTEGER NOT NULL ,
 
 testcase_s3_key VARCHAR(256) NOT NULL ,
 
-testcase_version INTEGER NOT NULL ,
+testcase_version INTEGER NOT NULL  DEFAULT 1,
 
 
-is_active BOOLEAN NOT NULL ,
+is_active BOOLEAN NOT NULL DEFAULT TRUE ,
+
+
+
+checker_script_S3_key VARCHAR(256)  ,
+ 
+CHECK (
+(
+checker_type = 'STANDARD' AND checker_script_S3_key IS NULL
+)
+
+ OR 
+
+ (
+ checker_type IN ('INTERACTIVE' , 'SPECIAL') AND checker_script_S3_key IS NOT NULL
+ )
+
+)
 
 
 CHECK (
@@ -157,3 +174,16 @@ testcase_version > 0
 
 );
 `;
+
+
+/*
+
+Probelm can be of normal kind or of  interactive / Special  so we need script to run and check for correcteness 
+checker_script_S3_key  
+
+we have 
+1) problem version  - 
+2 ) test case version - 
+3 ) checker version -
+
+*/
