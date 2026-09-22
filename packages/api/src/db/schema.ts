@@ -128,20 +128,21 @@ is_active BOOLEAN NOT NULL DEFAULT TRUE ,
 
 
 
-checker_script_S3_key VARCHAR(256)  ,
+checker_script_s3_key VARCHAR(256)  ,
  
 CHECK (
+
 (
-checker_type = 'STANDARD' AND checker_script_S3_key IS NULL
+checker_type = 'STANDARD' AND checker_script_s3_key IS NULL
 )
 
  OR 
 
  (
- checker_type IN ('INTERACTIVE' , 'SPECIAL') AND checker_script_S3_key IS NOT NULL
+ checker_type IN ('INTERACTIVE' , 'SPECIAL') AND checker_script_s3_key IS NOT NULL
  )
 
-)
+),
 
 
 CHECK (
@@ -184,6 +185,6 @@ checker_script_S3_key
 we have 
 1) problem version  - 
 2 ) test case version - 
-3 ) checker version -
+
 
 */
