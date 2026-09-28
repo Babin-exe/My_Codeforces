@@ -3,8 +3,16 @@ CREATE TYPE user_role as ENUM('USER' , 'ADMIN');
 `;
 
 export const CHECKER_TYPE = `CREATE TYPE checker_type as ENUM ('STANDARD' , 'INTERACTIVE' , 'SPECIAL' )`;
-
 export const STATUS = `CREATE TYPE status AS ENUM('DRAFT' , 'IN_REVIEW' , 'PUBLISHED' , 'ARCHIVED')`;
+
+
+export const VERDICT = `CREATE TYPE verdicts AS ENUM (
+    'PENDING', 'COMPILING', 'RUNNING',
+    'ACCEPTED', 'WRONG_ANSWER', 'TIME_LIMIT_EXCEEDED',
+    'MEMORY_LIMIT_EXCEEDED', 'RUNTIME_ERROR',
+    'COMPILATION_ERROR', 'INTERNAL_ERROR', 'CANCELLED'
+)`;
+
 
 export const USER = `
 CREATE TABLE users(
@@ -186,5 +194,59 @@ we have
 1) problem version  - 
 2 ) test case version - 
 
+
+*/
+
+
+export const SUBMISSIONS = `
+
+CREATE TABLE submissions (
+
+id UUID PRIMARY KEY DEFAULT gen_random_uuid(),
+
+user_id UUID NOT NULL ,
+CONSTRAINT fk_submissions_user_id FOREIGN KEY(user_id) REFERENCES users(id),
+
+problem_id UUID NOT NULL , 
+CONSTRAINT fk_submissions_problem_id FOREIGN KEY (problem_id) REFERENCES problems(id),
+
+problem_version_id UUID NOT NULL,
+CONSTRAINT fk_submissions_problem_version_id FOREIGN KEY(problem_version_id) REFERENCES problem_versions(id),
+
+language VARCHAR(32) NOT NULL,
+source_code_key VARCHAR(256) NOT NULL ,
+
+verdict verdicts NOT NULL DEFAULT 'PENDING',
+
+time_ms INTEGER ,
+memory_kb INTEGER,
+
+compiler_output TEXT, 
+runtime_output TEXT,
+
+judge_version VARCHAR(64) ,
+
+exit_code INTEGER ,
+
+signal VARCHAR(32),
+
+judged_at TIMESTAMPTZ ,
+
+
+
+test_case_total INTEGER ,
+test_case_passed INTEGER,
+
+
+created_at TIMESTAMPTZ NOT NULL DEFAULT NOW()
+);
+`;
+
+
+/*
+
+i may not know no of test cases at submission , and how many test case passed 
+but when the judged output comes then i know how many test cases were there and how many passed 
+so i can fill these later for that reason i will let it be null
 
 */

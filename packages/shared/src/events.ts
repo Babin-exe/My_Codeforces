@@ -8,6 +8,7 @@ export enum CheckerType {
     INTERACTIVE = "INTERACTIVE"   // Interactive communication
 };
 
+
 export interface BaseEvent<T extends string> {
     eventId: string;
     type: T;
@@ -33,9 +34,10 @@ export interface SubmissionCreatedEvent
     type: "SUBMISSION_CREATED";
 
     submissionId: string;
-    userId: string;
-    problemId: string;
 
+    userId: string;
+
+    problemId: string;
 
     problemVersionId: number;
 
@@ -61,7 +63,6 @@ export interface SubmissionJudgedEvent
     compilerOutput: string | null;
     runtimeOutput: string | null;
 
-    language: LanguageKeys;
     problemVersionId: number;
 
     testCaseTotal: number;
