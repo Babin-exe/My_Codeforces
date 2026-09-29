@@ -1,3 +1,4 @@
+/*
 export const USER_ROLE = `
 CREATE TYPE user_role as ENUM('USER' , 'ADMIN');
 `;
@@ -79,9 +80,9 @@ CREATE TABLE problems(
 `;
 
 
-/*
+
  fk_table_name_column name
- */
+
 
 
 export const PROBLEM_VERSIONS = `
@@ -185,7 +186,7 @@ testcase_version > 0
 `;
 
 
-/*
+
 
 Probelm can be of normal kind or of  interactive / Special  so we need script to run and check for correcteness 
 checker_script_S3_key  
@@ -195,7 +196,7 @@ we have
 2 ) test case version - 
 
 
-*/
+
 
 
 export const SUBMISSIONS = `
@@ -243,10 +244,59 @@ created_at TIMESTAMPTZ NOT NULL DEFAULT NOW()
 `;
 
 
-/*
 
 i may not know no of test cases at submission , and how many test case passed 
 but when the judged output comes then i know how many test cases were there and how many passed 
 so i can fill these later for that reason i will let it be null
 
-*/
+
+
+
+
+
+
+with this much sql in mind lets try to write the drizzle schema now ...
+
+ */
+
+
+
+
+import { sql } from "drizzle-orm";
+import { pgTable, uuid, varchar, timestamp, integer, pgEnum, check } from "drizzle-orm/pg-core";
+
+export const userrole = pgEnum('user_role', ['USER', 'ADMIN']);
+
+export const users = pgTable("users", {
+    id: uuid('id').defaultRandom().primaryKey(),
+    userName: varchar('user_name', { length: 32 }).notNull().unique(),
+    displayName: varchar('display_name', { length: 255 }).notNull(),
+    createdAt: timestamp('created_at', { withTimezone: true }).defaultNow().notNull(),
+    email: varchar('email', { length: 255 }).notNull().unique(),
+    phoneNo: varchar('phone_no', { length: 20 }).unique(),
+    passwordHash: varchar('password_hash', { length: 255 }).notNull(),
+    rating: integer("rating"),
+    maxRating: integer("max_rating"),
+    avatarUrl: varchar('avatar_url', { length: 256 }),
+    role: userrole('role').default('USER').notNull(),
+    updatedAt: timestamp('updated_at', { withTimezone: true }).defaultNow().notNull(),
+}, (table) => [
+    check('rating_logic_check',
+        sql`(
+        ${table.rating} IS NULL AND ${table.maxRating} IS NULL 
+    )
+    OR 
+    (
+    ${table.rating} IS NOT NULL 
+    AND ${table.maxRating} IS NOT NULL         
+    AND ${table.rating} >= 0
+    AND 
+     ${table.maxRating} >= ${table.rating}
+    )
+        `),
+]
+);
+
+
+
+
