@@ -268,6 +268,10 @@ import { pgTable, uuid, varchar, timestamp, integer, pgEnum, check, text, boolea
 export const userRole = pgEnum('user_role', ['USER', 'ADMIN']);
 export const status = pgEnum('status', ['DRAFT', 'IN_REVIEW', 'PUBLISHED', 'ARCHIVED']);
 export const checkerType = pgEnum('checker_type', ['STANDARD', 'INTERACTIVE', 'SPECIAL']);
+export const verdicts = pgEnum('verdicts', ['PENDING', 'COMPILING', 'RUNNING',
+    'ACCEPTED', 'WRONG_ANSWER', 'TIME_LIMIT_EXCEEDED',
+    'MEMORY_LIMIT_EXCEEDED', 'RUNTIME_ERROR',
+    'COMPILATION_ERROR', 'INTERNAL_ERROR', 'CANCELLED']);
 
 
 export const users = pgTable("users", {
@@ -358,5 +362,26 @@ export const problemVersions = pgTable('problem_versions', {
 
 ],
 );
+
+export const submissions = pgTable('submissions', {
+    id: uuid('id').defaultRandom().primaryKey(),
+    userId: uuid('user_id').notNull().references(() => users.id, { onDelete: 'restrict' }),
+    problemId: uuid('problem_id').notNull().references(() => problems.id, { onDelete: "restrict" }),
+    problemVersionId: uuid('problem_version_id').notNull().references(() => problemVersions.id, { onDelete: "restrict" }),
+    language: varchar('language', { length: 32 }).notNull(),
+    sourceCodeKey: varchar('source_code_key', { length: 256 }).notNull(),
+    verdict: verdicts('verdict').notNull().default("PENDING"),
+    timeMs: integer('time_ms'),
+    memoryKb: integer('memory_kb'),
+    compilerOutput: text('compiler_output'),
+    runtimeOutput: text('runtime_output'),
+    judgeVersion: varchar('judge_version', { length: 64 }),
+    exitCode: integer('exit_code'),
+    signal: varchar('signal', { length: 32 }),
+    judgedAt: timestamp('judged_at', { withTimezone: true }),
+    testCaseTotal: integer('test_case_total'),
+    testCasePassed: integer('test_case_passed'),
+    createdAt: timestamp('created_at', { withTimezone: true }).defaultNow().notNull()
+});
 
 
