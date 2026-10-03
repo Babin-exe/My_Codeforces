@@ -57,6 +57,7 @@ export const problems = pgTable("problems", {
 
 
 export const problemVersions = pgTable('problem_versions', {
+
     id: uuid('id').defaultRandom().primaryKey(),
     problemId: uuid('problem_id').notNull().references(() => problems.id, { onDelete: "restrict" }),
     versionNumber: integer('version_number').notNull(),
