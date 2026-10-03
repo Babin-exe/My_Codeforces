@@ -1,4 +1,8 @@
 import { defineConfig } from "drizzle-kit";
+
+
+import { config } from 'dotenv';
+
 /*
 This is the basic configuration for drizzle file 
 
@@ -8,6 +12,10 @@ This is the basic configuration for drizzle file
 4 ) credentials = info related to how to connect to the actual database(postgres)
 
 */
+
+
+config({ path: "../../.env" });
+
 
 export default defineConfig({
     dialect: "postgresql",

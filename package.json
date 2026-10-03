@@ -5,10 +5,10 @@
     "packages/*"
   ],
   "scripts": {
-    "dev:api": "bun run --filter api dev",
-    "dev:worker": "bun run --filter judge-worker dev",
-    "dev:web": "bun run --filter web dev",
-    "db:generate": "bun run --filter api db:generate",
-    "db:migrate": "bun run --filter api db:migrate"
+    "dev:api": "bun run --filter @oj/api dev",
+    "dev:worker": "bun run --filter @oj/judge-worker dev",
+    "dev:web": "bun run --filter @oj/web dev",
+    "db:generate": "bun run --filter @oj/api db:generate",
+    "db:migrate": "bun run --filter @oj/api db:migrate"
   }
 }

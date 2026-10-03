@@ -126,3 +126,5 @@ export type NewUser = typeof users.$inferInsert;
 export type Problem = typeof problems.$inferSelect;
 export type ProblemVersion = typeof problemVersions.$inferSelect;
 export type Submission = typeof submissions.$inferSelect;
+
+
