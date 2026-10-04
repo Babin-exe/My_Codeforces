@@ -53,9 +53,6 @@ export const problems = pgTable("problems", {
     deletedAt: timestamp('deleted_at', { withTimezone: true })
 });
 
-
-
-
 export const problemVersions = pgTable('problem_versions', {
 
     id: uuid('id').defaultRandom().primaryKey(),

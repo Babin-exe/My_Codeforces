@@ -9,6 +9,11 @@
     "dev:worker": "bun run --filter @oj/judge-worker dev",
     "dev:web": "bun run --filter @oj/web dev",
     "db:generate": "bun run --filter @oj/api db:generate",
-    "db:migrate": "bun run --filter @oj/api db:migrate"
+    "db:migrate": "bun run --filter @oj/api db:migrate",
+    "db:seed": "bun run --filter @oj/api db:seed",
+    "db:studio": "bun run --filter @oj/api db:studio"
+  },
+  "devDependencies": {
+    "@types/bun": "^1.4.2"
   }
 }
