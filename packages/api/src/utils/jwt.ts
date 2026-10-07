@@ -1,5 +1,4 @@
 import jwt from "jsonwebtoken";
-import { AppError } from "./app-error";
 
 interface jwtPayload {
     userId: string,
@@ -10,7 +9,7 @@ interface jwtPayload {
 
 export function getJwtSecret(): string {
     const secret = process.env.JWT_SECRET_KEY;
-    if (!secret) throw new Error("Missing  JWT_SECRET_KEY");
+    if (!secret) throw new Error("Missing JWT_SECRET_KEY");
     return secret;
 }
 
