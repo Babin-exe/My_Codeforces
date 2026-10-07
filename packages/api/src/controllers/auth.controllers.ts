@@ -1,5 +1,6 @@
 import type { Request, Response, NextFunction } from "express";
 import { loginUser, registerUser } from "../services/auth.services.ts";
+import { AppError } from "../utils/app-error.ts";
 
 
 export function emailChecker(email: string): boolean {
@@ -38,19 +39,19 @@ export function userNameChecker(userName: string): boolean {
 export function userInputValidator(input: { userName: string, email: string, password: string }): void {
 
     if (!input.userName || !input.email || !input.password) {
-        throw new Error("All fields are required");
+        throw new AppError(400, "All fields are required");
     }
 
     if (!userNameChecker(input.userName)) {
-        throw new Error("Invalid userName format or length");
+        throw new AppError(400, "Invalid userName format or length");
     }
 
     if (!emailChecker(input.email)) {
-        throw new Error("Invalid email format");
+        throw new AppError(400, "Invalid email format");
     }
 
     if (!passwordChecker(input.password)) {
-        throw new Error("Invalid password length or format");
+        throw new AppError(400, "Invalid password length or format");
     }
 
 

@@ -1,5 +1,6 @@
 import express from "express";
 import { authRouter } from "./routes/auth.route.ts";
+import { errorHandler } from "./middleware/error.middleware.ts";
 
 const app = express();
 app.use(express.json());
@@ -16,3 +17,5 @@ app.get("/", (req, res) => {
 app.listen(PORT, () => {
     console.log("Hello world");
 });
+
+app.use(errorHandler);

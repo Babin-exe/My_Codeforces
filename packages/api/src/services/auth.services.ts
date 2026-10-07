@@ -5,9 +5,6 @@ import { signToken } from "../utils/jwt.ts";
 
 export async function registerUser(input: { userName: string, email: string, password: string }) {
 
-
-    //First lets check if this user is already in the db....
-
     const existingUser = await db.query.users.findFirst({ where: or(eq(users.userName, input.userName), eq(users.email, input.email)) });
 
     if (existingUser) {
