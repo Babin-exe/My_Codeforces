@@ -14,8 +14,10 @@ app.get("/", (req, res) => {
     return res.status(200).json({ success: true, message: "Hehe" });
 });
 
+
+
+app.use(errorHandler);
+
 app.listen(PORT, () => {
     console.log("Hello world");
 });
-
-app.use(errorHandler);
