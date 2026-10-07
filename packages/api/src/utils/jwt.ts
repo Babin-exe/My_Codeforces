@@ -1,14 +1,20 @@
 import jwt from "jsonwebtoken";
+import { AppError } from "./app-error";
 
-export interface jwtPayload {
+interface jwtPayload {
     userId: string,
     role: string
 }
 
 
-const JWT_SECRET = process.env.JWT_SECRET_KEY || "default_dev_secret key";
 
-if (!JWT_SECRET) throw new Error("Missing jwt key");
+export function getJwtSecret(): string {
+    const secret = process.env.JWT_SECRET_KEY;
+    if (!secret) throw new Error("Missing  JWT_SECRET_KEY");
+    return secret;
+}
+
+const JWT_SECRET = getJwtSecret();
 
 
 export function signToken(payload: jwtPayload): string {
@@ -16,5 +22,5 @@ export function signToken(payload: jwtPayload): string {
 }
 
 export function verifyToken(token: string): jwtPayload {
-    return jwt.verify(token, JWT_SECRET) as jwtPayload;
+    return jwt.verify(token, JWT_SECRET) as unknown as jwtPayload;
 }
