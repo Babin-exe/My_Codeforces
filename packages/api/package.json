@@ -11,8 +11,9 @@
   },
   "dependencies": {
     "@oj/shared": "workspace:*",
-    "express": "^5.1.0",
     "drizzle-orm": "^0.44.0",
+    "express": "^5.1.0",
+    "jsonwebtoken": "^9.0.3",
     "postgres": "^3.4.0"
   },
   "devDependencies": {

@@ -42,3 +42,38 @@ export async function registerUser(input: { userName: string, email: string, pas
     };
 
 };
+
+export async function loginUser(input: { email: string, password: string }) {
+
+
+    const user = await db.query.users.findFirst({ where: eq(users.email, input.email) });
+
+    if (!user) {
+        throw new Error("User not found");
+    }
+
+    if (user.email != input.email || !await Bun.password.verify(input.password, user.passwordHash)) {
+        throw new Error("Invalid credentials");
+
+    }
+
+    const token = signToken({ userId: user.id, role: user.role });
+
+    if (!token) {
+        throw new Error("Failed to login");
+    }
+
+
+    const result = {
+        user: {
+            userId: user.id,
+            userName: user.userName,
+            email: user.email,
+            role: user.role
+        },
+        token
+    };
+
+    return result;
+
+}
