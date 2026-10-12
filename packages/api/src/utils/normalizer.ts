@@ -9,6 +9,6 @@ export function normalizeUserName(userName: string) {
     if (typeof userName !== "string") {
         return null;
     }
-    return userName.trim();
+    return userName.trim().toLowerCase();
 }
 

@@ -1,11 +1,9 @@
 import jwt from "jsonwebtoken";
 
 interface jwtPayload {
-    userId: string,
+    id: string,
     role: string
 }
-
-
 
 export function getJwtSecret(): string {
     const secret = process.env.JWT_SECRET_KEY;

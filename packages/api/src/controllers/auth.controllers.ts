@@ -20,15 +20,15 @@ export function passwordChecker(password: string): boolean {
 
     const hasLowerCase = /[a-z]/.test(password);
     const hasUpperCase = /[A-Z]/.test(password);
-    const hasSpecialChar = /[!@#$%^&*(),.?":{}|<>]/.test(password);
+    const hasSpecialChar = /[!@#$_%^&*(),.?":{}|<>]/.test(password);
     const hasDigit = /[0-9]/.test(password);
 
     return (hasLowerCase && hasUpperCase && hasSpecialChar && hasDigit);
 }
 
+
 export function userNameChecker(userName: string): boolean {
     return /^[a-z][a-z0-9_]{4,29}$/.test(userName);
-
 }
 
 
@@ -90,6 +90,7 @@ export async function registerHandler(req: Request, res: Response, next: NextFun
             httpOnly: true,
             maxAge: 24 * 60 * 60 * 1000,
             secure: process.env.NODE_ENV === "production",
+            path: "/"
         }).json({
             success: true,
             message: "User Registered Successfully",
@@ -121,12 +122,14 @@ export async function loginHandler(req: Request, res: Response, next: NextFuncti
 
         if (normalizedEmail === null) throw new AppError(400, "Invalid email");
 
+
         const result = await loginUser({ email: normalizedEmail, password });
 
         return res.cookie("token", result.token, {
             sameSite: "strict",
             httpOnly: true,
             secure: process.env.NODE_ENV === "production",
+            path: "/",
             maxAge: 24 * 60 * 60 * 1000
         }).json({ success: true, message: "Logged in successfully", data: result.user });
 
@@ -136,3 +139,23 @@ export async function loginHandler(req: Request, res: Response, next: NextFuncti
     }
 }
 
+
+export function logoutHandler(req: Request, res: Response, next: NextFunction) {
+
+    try {
+
+        return res.status(200).clearCookie("token", {
+            httpOnly: true,
+            secure: process.env.NODE_ENV === "production",
+            sameSite: "strict",
+            path: "/"
+        })
+            .json({ success: true, message: "logout success" });
+    } catch (error) {
+        next(error);
+    }
+}
+
+export function getMe(req: Request, res: Response) {
+    return res.status(200).json({ success: true, data: req.user });
+}

@@ -6,13 +6,7 @@ import { AppError } from "../utils/app-error.ts";
 
 export async function registerUser(input: { userName: string, email: string, password: string }) {
 
-    if ([input.email, input.password, input.userName].some(i => !i)) {
-        throw new AppError(400, "All fields are required");
-    }
 
-    if (typeof input.email !== "string" || typeof input.userName !== "string" || typeof input.password !== "string") {
-        throw new AppError(400, "Invalid field types");
-    }
 
     const existingUser = await db.query.users.findFirst({ where: or(eq(users.userName, input.userName), eq(users.email, input.email)) });
 
@@ -33,7 +27,7 @@ export async function registerUser(input: { userName: string, email: string, pas
 
     if (!newUser) throw new AppError(500, "Failed to create user");
 
-    const token = signToken({ userId: newUser.id, role: newUser.role });
+    const token = signToken({ id: newUser.id, role: newUser.role });
 
     if (!token) throw new AppError(500, "Failed to generate token");
 
@@ -41,7 +35,7 @@ export async function registerUser(input: { userName: string, email: string, pas
     return {
         user: {
 
-            userId: newUser?.id,
+            id: newUser?.id,
             userName: newUser?.userName,
             email: newUser?.email,
             role: newUser?.role
@@ -54,14 +48,6 @@ export async function registerUser(input: { userName: string, email: string, pas
 export async function loginUser(input: { email: string, password: string }) {
 
 
-    if ([input.email, input.password].some(i => !i)) {
-        throw new AppError(400, "All fields are required");
-    }
-
-    if (typeof input.email !== "string" || typeof input.password !== "string") {
-        throw new AppError(400, "Invalid field types");
-    }
-
     const user = await db.query.users.findFirst({ where: eq(users.email, input.email) });
 
     if (!user) {
@@ -73,7 +59,7 @@ export async function loginUser(input: { email: string, password: string }) {
 
     }
 
-    const token = signToken({ userId: user.id, role: user.role });
+    const token = signToken({ id: user.id, role: user.role });
 
     if (!token) {
         throw new AppError(500, "Failed to generate token");
@@ -82,7 +68,7 @@ export async function loginUser(input: { email: string, password: string }) {
 
     const result = {
         user: {
-            userId: user.id,
+            id: user.id,
             userName: user.userName,
             email: user.email,
             role: user.role
