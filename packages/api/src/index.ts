@@ -1,5 +1,6 @@
 import express from "express";
 import { authRouter } from "./routes/auth.route.ts";
+import { problemRouter } from "./routes/problem.route.ts";
 import { errorHandler } from "./middleware/error.middleware.ts";
 import cookieParser from "cookie-parser";
 
@@ -9,6 +10,7 @@ app.use(cookieParser());
 const PORT = process.env.PORT || 4000;
 
 app.use("/api/auth", authRouter);
+app.use("/api/problems", problemRouter);
 
 
 app.get("/", (req, res) => {
