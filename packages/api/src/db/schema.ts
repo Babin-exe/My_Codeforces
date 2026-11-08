@@ -40,9 +40,6 @@ export const users = pgTable("users", {
 ]
 );
 
-
-
-
 export const problems = pgTable("problems", {
     id: uuid('id').defaultRandom().primaryKey(),
     createdAt: timestamp('created_at', { withTimezone: true }).defaultNow().notNull(),
@@ -53,11 +50,6 @@ export const problems = pgTable("problems", {
     updatedAt: timestamp('updated_at', { withTimezone: true }).defaultNow().notNull(),
     deletedAt: timestamp('deleted_at', { withTimezone: true })
 });
-
-
-
-
-
 
 
 export const problemVersions = pgTable('problem_versions', {
@@ -104,7 +96,6 @@ export const problemVersions = pgTable('problem_versions', {
 ],
 );
 
-
 export const problemsRelations = relations(problems, ({ many }) => ({
     versions: many(problemVersions)
 }));
@@ -115,8 +106,6 @@ export const problemVersionsRelations = relations(problemVersions, ({ one }) => 
         references: [problems.id]
     })
 }));
-
-
 
 export const submissions = pgTable('submissions', {
     id: uuid('id').defaultRandom().primaryKey(),
@@ -145,5 +134,3 @@ export type NewUser = typeof users.$inferInsert;
 export type Problem = typeof problems.$inferSelect;
 export type ProblemVersion = typeof problemVersions.$inferSelect;
 export type Submission = typeof submissions.$inferSelect;
-
-

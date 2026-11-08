@@ -1,7 +1,7 @@
 import type { Request, Response, NextFunction } from "express";
-import { createProblem, getProblem } from "../services/problem.services.ts";
+import { createProblem, getProblemById, getProblemBySlug } from "../services/problem.services.ts";
 import { AppError } from "../utils/app-error.ts";
-import type { CreateProblemInput } from "../validators/problem.validators.ts";
+import type { CreateProblemInput, ProblemIdParamSchema, ProblemSlugParamSchema } from "../validators/problem.validators.ts";
 
 
 
@@ -15,8 +15,6 @@ export async function createProblemHandler(req: Request, res: Response, next: Ne
 
     const input = req.body as CreateProblemInput;
     const userId = req.user.id;
-
-
     const result = await createProblem(input, userId);
 
     return res.status(201).json({
@@ -35,24 +33,13 @@ export async function getProblemBySlugHandler(req: Request, res: Response, next:
 
   try {
 
-
-    const { slug } = req.params;
-
-
-    if (!slug || typeof slug !== "string") {
-      throw new AppError(400, "No slug provided");
+    if (!req.user) {
+      throw new AppError(401, "Not authenticated");
     }
 
-    if (slug.length < 3 || slug.length > 100) {
-      throw new AppError(400, "Slug must be between 3 and 100 characters");
-    }
+    const { slug } = req.params as ProblemSlugParamSchema;
 
-    if (!/^[a-z0-9]+(?:-[a-z0-9]+)*$/.test(slug)) {
-      throw new AppError(400, "Slug must be in kebab-case (e.g. 'two-sum')");
-    }
-
-
-    const result = await getProblem(slug);
+    const result = await getProblemBySlug(slug);
 
     return res.status(200).json({
       success: true,
@@ -73,5 +60,22 @@ export async function searchProblemsHandler(req: Request, res: Response, next: N
 
 
 export async function getProblemByIdHandler(req: Request, res: Response, next: NextFunction) {
+  try {
 
-};
+
+    if (!req.user) {
+      throw new AppError(401, "Not Authenticated");
+    }
+
+    const { id } = req.params as ProblemIdParamSchema;
+
+
+    const result = await getProblemById(id);
+
+    return res.status(200).json({ success: true, message: "Successfully retrived problem", data: result })
+
+  } catch (error) {
+    next(error);
+  }
+
+}; 

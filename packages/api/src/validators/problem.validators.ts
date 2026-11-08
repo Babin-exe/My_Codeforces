@@ -80,7 +80,7 @@ export const createProblemSchema = z.object({
         message instead of hitting a Postgres CHECK violation (which returns a 500).
 
     */
-   
+
     if (data.checkerType === CheckerType.STANDARD) {
         return data.checkerScriptS3Key === undefined;
     }
@@ -109,3 +109,15 @@ export const createProblemSchema = z.object({
 export type CreateProblemInput = z.infer<typeof createProblemSchema>;
 
 
+
+export const problemIdParamSchema = z.object({
+    id: z.string().uuid("Invalid problem ID format(must be a valid UUID)")
+});
+
+export type ProblemIdParamSchema = z.infer<typeof problemIdParamSchema>;
+
+export const problemSlugParamSchema = z.object({
+    slug: z.string().min(3, "Slug must be at least 3 characters").max(100, "Slug must be at most 100 characters").regex(/^[a-z0-9]+(?:-[a-z0-9]+)*$/, "Slug must be in kebab-case (e.g. 'two-sum')")
+});
+
+export type ProblemSlugParamSchema = z.infer<typeof problemSlugParamSchema>;

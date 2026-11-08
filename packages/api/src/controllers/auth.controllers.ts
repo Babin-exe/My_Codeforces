@@ -13,7 +13,6 @@ export function emailChecker(email: string): boolean {
 
 }
 
-
 export function passwordChecker(password: string): boolean {
 
     if (password.length < 10 || password.length > 30) return false;
@@ -31,11 +30,7 @@ export function userNameChecker(userName: string): boolean {
     return /^[a-z][a-z0-9_]{4,29}$/.test(userName);
 }
 
-
-
 export function userInputValidator(input: { userName: string, email: string, password: string }) {
-
-
 
     const userName = normalizeUserName(input.userName);
     const email = normalizeEmail(input.email);
@@ -107,29 +102,22 @@ export async function registerHandler(req: Request, res: Response, next: NextFun
 export async function loginHandler(req: Request, res: Response, next: NextFunction) {
     try {
 
-
-
-        
         if (!req.body || typeof req.body !== "object" || Array.isArray(req.body)) {
             throw new AppError(400, "Invalid request body");
         }
 
-        
-        
         const { email, password } = req.body;
-        
+
         if (typeof email !== "string" || typeof password !== "string") {
             throw new AppError(400, "Invalid field types");
         }
-        
-        
+
         const normalizedEmail = normalizeEmail(email);
-        
+
         if (normalizedEmail === null) throw new AppError(400, "Invalid email");
-        
-        
+
         const result = await loginUser({ email: normalizedEmail, password });
-        
+
         return res.cookie("token", result.token, {
             sameSite: "strict",
             httpOnly: true,
@@ -137,7 +125,6 @@ export async function loginHandler(req: Request, res: Response, next: NextFuncti
             path: "/",
             maxAge: 24 * 60 * 60 * 1000
         }).json({ success: true, message: "Logged in successfully", data: result.user });
-
 
     } catch (error) {
         next(error);

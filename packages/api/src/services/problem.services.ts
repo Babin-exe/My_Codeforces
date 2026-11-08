@@ -2,7 +2,7 @@ import { db } from "../db/connection.ts";
 import { problems, problemVersions } from "../db/schema.ts";
 import { eq } from "drizzle-orm";
 import { AppError } from "../utils/app-error.ts";
-import type { CreateProblemInput } from "../validators/problem.validators.ts";
+import type { CreateProblemInput, ProblemIdParamSchema } from "../validators/problem.validators.ts";
 
 /*
 =============================================================================
@@ -110,7 +110,7 @@ export async function createProblem(input: CreateProblemInput, userId: string) {
 };
 
 
-export async function getProblem(slug: string) {
+export async function getProblemBySlug(slug: string) {
 
   const problem = await db.query.problems.findFirst({
     where: eq(problems.slug, slug),
@@ -123,5 +123,20 @@ export async function getProblem(slug: string) {
     throw new AppError(404, `Problem with slug '${slug}' not found`);
   }
 
+  return problem;
+};
+
+export async function getProblemById(id: string) {
+
+
+  const problem = await db.query.problems.findFirst({
+    where: eq(problems.id, id),
+    with: { versions: true }
+  });
+
+  if (!problem) {
+    throw new AppError(404, `Problem with id ${id} not found`);
+  }
+  
   return problem;
 };
