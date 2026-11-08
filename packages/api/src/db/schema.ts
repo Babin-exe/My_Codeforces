@@ -1,4 +1,4 @@
-import { sql } from "drizzle-orm";
+import { sql, relations } from "drizzle-orm";
 import { pgTable, uuid, varchar, timestamp, integer, pgEnum, check, text, boolean, unique } from "drizzle-orm/pg-core";
 
 export const userRole = pgEnum('user_role', ['USER', 'ADMIN']);
@@ -42,6 +42,7 @@ export const users = pgTable("users", {
 
 
 
+
 export const problems = pgTable("problems", {
     id: uuid('id').defaultRandom().primaryKey(),
     createdAt: timestamp('created_at', { withTimezone: true }).defaultNow().notNull(),
@@ -52,6 +53,10 @@ export const problems = pgTable("problems", {
     updatedAt: timestamp('updated_at', { withTimezone: true }).defaultNow().notNull(),
     deletedAt: timestamp('deleted_at', { withTimezone: true })
 });
+
+
+
+
 
 
 
@@ -98,6 +103,20 @@ export const problemVersions = pgTable('problem_versions', {
 
 ],
 );
+
+
+export const problemsRelations = relations(problems, ({ many }) => ({
+    versions: many(problemVersions)
+}));
+
+export const problemVersionsRelations = relations(problemVersions, ({ one }) => ({
+    problem: one(problems, {
+        fields: [problemVersions.problemId],
+        references: [problems.id]
+    })
+}));
+
+
 
 export const submissions = pgTable('submissions', {
     id: uuid('id').defaultRandom().primaryKey(),

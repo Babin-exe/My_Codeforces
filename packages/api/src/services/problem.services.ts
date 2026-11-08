@@ -53,62 +53,75 @@ import type { CreateProblemInput } from "../validators/problem.validators.ts";
 
 export async function createProblem(input: CreateProblemInput, userId: string) {
 
-    // Check for duplicate slug before attempting insert.
-    // Yes, the database has a UNIQUE constraint on slug too, but checking 
-    // here lets us return a clean 409 with a human-readable message,
-    // instead of catching a raw Postgres unique violation error.
-    const existing = await db.query.problems.findFirst({
-        where: eq(problems.slug, input.slug),
-    });
+  // Check for duplicate slug before attempting insert.
+  // Yes, the database has a UNIQUE constraint on slug too, but checking 
+  // here lets us return a clean 409 with a human-readable message,
+  // instead of catching a raw Postgres unique violation error.
 
-    if (existing) {
-        throw new AppError(409, `Problem with slug '${input.slug}' already exists`);
+  const existing = await db.query.problems.findFirst({
+    where: eq(problems.slug, input.slug),
+  });
+
+  if (existing) {
+    throw new AppError(409, `Problem with slug '${input.slug}' already exists`);
+  }
+
+
+  // Transaction: both inserts succeed together or neither does
+  const result = await db.transaction(async (tx) => {
+
+    // Step 1: Create the problem shell
+    const [problem] = await tx.insert(problems).values({
+      slug: input.slug,
+      createdBy: userId,
+    }).returning();
+
+    if (!problem) {
+      throw new AppError(500, "Failed to create problem");
     }
 
+    // Step 2: Create the first version (version 1)
+    const [version] = await tx.insert(problemVersions).values({
+      problemId: problem.id,
+      versionNumber: 1,
+      createdBy: userId,
+      title: input.title,
+      statement: input.statement,
+      difficulty: input.difficulty,
+      timeLimitMs: input.timeLimitMs,
+      memoryLimitMb: input.memoryLimitMb,
+      outputLimitMb: input.outputLimitMb,
+      checkerType: input.checkerType,
+      testCaseCount: input.testCaseCount,
+      testCaseS3Key: input.testCaseS3Key,
+      testCaseVersion: input.testCaseVersion,
+      checkerScriptS3Key: input.checkerScriptS3Key ?? null,
+    }).returning();
 
-    // Transaction: both inserts succeed together or neither does
-    const result = await db.transaction(async (tx) => {
+    if (!version) {
+      throw new AppError(500, "Failed to create problem version");
+    }
 
-        // Step 1: Create the problem shell
-        const [problem] = await tx.insert(problems).values({
-            slug: input.slug,
-            createdBy: userId,
-        }).returning();
+    // Return both — the controller decides what to send to the client
+    return { problem, version };
+  });
 
-        if (!problem) {
-            throw new AppError(500, "Failed to create problem");
-        }
-
-        // Step 2: Create the first version (version 1)
-        const [version] = await tx.insert(problemVersions).values({
-            problemId: problem.id,
-            versionNumber: 1,
-            createdBy: userId,
-            title: input.title,
-            statement: input.statement,
-            difficulty: input.difficulty,
-            timeLimitMs: input.timeLimitMs,
-            memoryLimitMb: input.memoryLimitMb,
-            outputLimitMb: input.outputLimitMb,
-            checkerType: input.checkerType,
-            testCaseCount: input.testCaseCount,
-            testCaseS3Key: input.testCaseS3Key,
-            testCaseVersion: input.testCaseVersion,
-            checkerScriptS3Key: input.checkerScriptS3Key ?? null,
-        }).returning();
-
-        if (!version) {
-            throw new AppError(500, "Failed to create problem version");
-        }
-
-        // Return both — the controller decides what to send to the client
-        return { problem, version };
-    });
-
-    return result;
-}
+  return result;
+};
 
 
-export async function getProblem() {
+export async function getProblem(slug: string) {
 
-}
+  const problem = await db.query.problems.findFirst({
+    where: eq(problems.slug, slug),
+    with: {
+      versions: true,
+    }
+  });
+
+  if (!problem) {
+    throw new AppError(404, `Problem with slug '${slug}' not found`);
+  }
+
+  return problem;
+};

@@ -108,23 +108,28 @@ export async function loginHandler(req: Request, res: Response, next: NextFuncti
     try {
 
 
+
+        
         if (!req.body || typeof req.body !== "object" || Array.isArray(req.body)) {
             throw new AppError(400, "Invalid request body");
         }
 
+        
+        
         const { email, password } = req.body;
-
+        
         if (typeof email !== "string" || typeof password !== "string") {
             throw new AppError(400, "Invalid field types");
         }
-
+        
+        
         const normalizedEmail = normalizeEmail(email);
-
+        
         if (normalizedEmail === null) throw new AppError(400, "Invalid email");
-
-
+        
+        
         const result = await loginUser({ email: normalizedEmail, password });
-
+        
         return res.cookie("token", result.token, {
             sameSite: "strict",
             httpOnly: true,

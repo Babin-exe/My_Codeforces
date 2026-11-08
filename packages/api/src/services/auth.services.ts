@@ -34,7 +34,6 @@ export async function registerUser(input: { userName: string, email: string, pas
 
     return {
         user: {
-
             id: newUser?.id,
             userName: newUser?.userName,
             email: newUser?.email,

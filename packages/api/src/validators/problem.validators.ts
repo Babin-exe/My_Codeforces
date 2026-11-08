@@ -7,11 +7,6 @@ export enum CheckerType {
     SPECIAL = "SPECIAL"
 }
 
-
-
-
-
-
 export const createProblemSchema = z.object({
 
     slug: z.string()
@@ -71,18 +66,21 @@ export const createProblemSchema = z.object({
     // (mirrors the checker_stuff CHECK constraint in your schema)
     checkerScriptS3Key: z.string().min(1).optional(),
 
+
 }).refine((data) => {
     /*
-        This is a cross-field validation — it checks relationships BETWEEN fields.
+
         
-        Your schema.ts has this CHECK constraint:
+
           (checkerType = 'STANDARD' AND checkerScriptS3Key IS NULL)
           OR
           (checkerType IN ('INTERACTIVE','SPECIAL') AND checkerScriptS3Key IS NOT NULL)
         
         We replicate that same logic here so the user gets a 400 with a clear 
         message instead of hitting a Postgres CHECK violation (which returns a 500).
+
     */
+   
     if (data.checkerType === CheckerType.STANDARD) {
         return data.checkerScriptS3Key === undefined;
     }
