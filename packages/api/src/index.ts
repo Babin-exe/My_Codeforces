@@ -25,3 +25,15 @@ app.use(errorHandler);
 app.listen(PORT, () => {
     console.log("Hello world");
 });
+
+
+/* 
+
+when you read this :
+
+fix the secret info returned when getting a problem
+considier if we need auth for viewing a problem
+
+write the search function also and read the chat log for more......
+
+*/

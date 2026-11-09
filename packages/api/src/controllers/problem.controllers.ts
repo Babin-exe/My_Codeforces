@@ -56,6 +56,7 @@ export async function getProblemBySlugHandler(req: Request, res: Response, next:
 
 export async function searchProblemsHandler(req: Request, res: Response, next: NextFunction) {
 
+  
 };
 
 
