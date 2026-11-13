@@ -121,3 +121,33 @@ export const problemSlugParamSchema = z.object({
 });
 
 export type ProblemSlugParamSchema = z.infer<typeof problemSlugParamSchema>;
+
+
+
+const ratingSchema = z.coerce.number()
+    .int()
+    .min(800, "Rating cannot be less than 800")
+    .max(3500, "Rating cannot exceed 3500");
+
+
+export const searchProblemsQuerySchema = z.object({
+
+    minRating: ratingSchema.optional().default(800),
+    maxRating: ratingSchema.optional().default(3500),
+
+    pageNumber: z.coerce.number().int().positive().optional().default(1),
+    pageSize: z.coerce.number().int().positive().optional().default(20),
+
+    query: z.coerce.string()
+        .min(1, "Query must be at least 1 character")
+        .max(100, "Query must be at most 100 characters")
+        .optional(),
+
+}).refine((data) => data.minRating <= data.maxRating, {
+    message: "Minimum rating cannot exceed maximum rating",
+    path: ["minRating"]
+});
+
+
+export type SearchProblemsQuerySchema = z.infer<typeof searchProblemsQuerySchema>;
+

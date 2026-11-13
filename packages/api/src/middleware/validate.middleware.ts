@@ -50,3 +50,23 @@ export function validateParams(schema: z.ZodType) {
     next();
   };
 };
+
+
+export function validateQuery(schema: z.ZodType) {
+  return async (req: Request, res: Response, next: NextFunction) => {
+
+    const result = await schema.safeParseAsync(req.query);
+
+    if (!result.success) {
+
+      const errors = result.error.issues.map(
+        (issue) => ({ field: issue.path.join("."), message: issue.message })
+      );
+
+      res.status(400).json({ success: false, message: "Invalid query parameters", errors })
+      return;
+    }
+    req.query = result.data as Record<string, string>;
+    next();
+  };
+}

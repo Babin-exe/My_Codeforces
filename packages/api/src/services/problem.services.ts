@@ -5,35 +5,7 @@ import { AppError } from "../utils/app-error.ts";
 import type { CreateProblemInput, ProblemIdParamSchema } from "../validators/problem.validators.ts";
 
 /*
-=============================================================================
-  PHASE 4: The Service Layer
-=============================================================================
 
-  WHY A SEPARATE SERVICE LAYER:
-  -----------------------------
-  The controller handles HTTP concerns (req, res, status codes, cookies).
-  The service handles BUSINESS LOGIC (database queries, data rules).
-  
-  This separation gives you:
-  
-  1. TESTABILITY: You can unit test createProblem() by passing plain objects.
-     No need to mock Express Request/Response objects.
-  
-  2. REUSABILITY: If you later build a CLI tool, a GraphQL API, or a 
-     background job that also creates problems, you just call the same 
-     service function. It doesn't know or care about HTTP.
-  
-  3. CLARITY: The controller is 5 lines. The service is where the real 
-     logic lives. Each file has one job.
-  
-  Compare with your auth code:
-    Controller (auth.controllers.ts) → handles req/res, calls service
-    Service (auth.services.ts)       → does the actual DB work
-  Same pattern here.
-  
-  
-  WHY TRANSACTIONS:
-  -----------------
   Creating a problem requires TWO inserts:
     1. Insert into `problems` table (the problem shell: slug, createdBy)
     2. Insert into `problem_versions` table (the actual content: title, statement, etc.)
@@ -47,7 +19,7 @@ import type { CreateProblemInput, ProblemIdParamSchema } from "../validators/pro
   
   Inside the callback, you use `tx` instead of `db` for all queries.
   `tx` is a "transactional db" — same API, but tied to the transaction.
-=============================================================================
+  
 */
 
 
@@ -137,6 +109,6 @@ export async function getProblemById(id: string) {
   if (!problem) {
     throw new AppError(404, `Problem with id ${id} not found`);
   }
-  
+
   return problem;
 };
