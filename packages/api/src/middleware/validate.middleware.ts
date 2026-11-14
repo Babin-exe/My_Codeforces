@@ -70,3 +70,4 @@ export function validateQuery(schema: z.ZodType) {
     next();
   };
 }
+

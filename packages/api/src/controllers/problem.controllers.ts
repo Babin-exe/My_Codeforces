@@ -1,7 +1,7 @@
 import type { Request, Response, NextFunction } from "express";
-import { createProblem, getProblemById, getProblemBySlug } from "../services/problem.services.ts";
+import { createProblem, getProblemById, getProblemBySlug, searchProblems } from "../services/problem.services.ts";
 import { AppError } from "../utils/app-error.ts";
-import type { CreateProblemInput, ProblemIdParamSchema, ProblemSlugParamSchema } from "../validators/problem.validators.ts";
+import type { CreateProblemInput, ProblemIdParamSchema, ProblemSlugParamSchema, SearchProblemsQuerySchema } from "../validators/problem.validators.ts";
 
 
 
@@ -55,7 +55,25 @@ export async function getProblemBySlugHandler(req: Request, res: Response, next:
 
 export async function searchProblemsHandler(req: Request, res: Response, next: NextFunction) {
 
-  
+
+  try {
+
+    const query = req.query as unknown as SearchProblemsQuerySchema;
+
+    const result = await searchProblems(query);
+
+    return res.status(200).json({
+      success: true,
+      message: "Problems retrived successfully",
+      data: result.problems,
+      pagination: result.pagination
+    });
+
+
+  } catch (error) {
+    next(error);
+  }
+
 };
 
 

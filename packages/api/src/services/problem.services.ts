@@ -1,8 +1,8 @@
 import { db } from "../db/connection.ts";
 import { problems, problemVersions } from "../db/schema.ts";
-import { eq } from "drizzle-orm";
+import { eq, and, or, isNull, gte, lte, ilike, countDistinct, asc } from "drizzle-orm";
 import { AppError } from "../utils/app-error.ts";
-import type { CreateProblemInput, ProblemIdParamSchema } from "../validators/problem.validators.ts";
+import type { CreateProblemInput, ProblemIdParamSchema, SearchProblemsQuerySchema } from "../validators/problem.validators.ts";
 
 /*
 
@@ -112,3 +112,70 @@ export async function getProblemById(id: string) {
 
   return problem;
 };
+
+
+// pagination is to be done ... 
+
+
+// export async function searchProblems(query: SearchProblemsQuerySchema) {
+
+
+//   const searchText = query.query?.trim();
+
+//   const textFilter = searchText
+//     ? or(
+//       ilike(problemVersions.title, `%${searchText}%`),
+//       ilike(
+//         problems.slug,
+//         `%${searchText.replace(/\s+/g, "-")}%`,
+//       ),
+//     )
+//     : undefined;
+
+//   const conditions =
+//     [
+//       eq(problems.visibility, true),
+//       eq(problems.status, "PUBLISHED"),
+//       isNull(problems.deletedAt),
+//       eq(problemVersions.isActive, true),
+//       gte(problemVersions.difficulty, query.minRating),
+//       lte(problemVersions.difficulty, query.maxRating),
+//       textFilter
+//     ];
+
+
+//   const whereClause = and(...conditions);
+
+
+//   const [countResult] = await db.select({
+//     totalItems: countDistinct(problems.id),
+//   })
+//     .from(problems).
+//     innerJoin(problemVersions, eq(problemVersions.problemId, problems.id))
+//     .where(whereClause);
+
+
+//   const totalItems = countResult?.totalItems ?? 0;
+//   const offset = (query.pageNumber - 1) * query.pageSize;
+
+//   const pageProblems = await db
+//     .select({
+//       id: problems.id,
+//       slug: problems.slug,
+//       title: problemVersions.title,
+//       difficulty: problemVersions.difficulty,
+//     })
+//     .from(problems)
+//     .innerJoin(
+//       problemVersions,
+//       eq(problems.id, problemVersions.problemId),
+//     )
+//     .where(whereClause)
+//     .orderBy(
+//       asc(problemVersions.title),
+//       asc(problems.id),
+//     )
+//     .limit(query.pageSize)
+//     .offset(offset);
+
+// };
