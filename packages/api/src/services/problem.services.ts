@@ -114,68 +114,77 @@ export async function getProblemById(id: string) {
 };
 
 
-// pagination is to be done ... 
+export async function searchProblems(query: SearchProblemsQuerySchema) {
+
+  const searchText = query.query?.trim();
+
+  const textFilter = searchText
+    ? or(
+      ilike(problemVersions.title, `%${searchText}%`),
+      ilike(
+        problems.slug,
+        `%${searchText.replace(/\s+/g, "-")}%`,
+      ),
+    )
+    : undefined;
+
+  const conditions =
+    [
+      eq(problems.visibility, true),
+      eq(problems.status, "PUBLISHED"),
+      isNull(problems.deletedAt),
+      eq(problemVersions.isActive, true),
+      gte(problemVersions.difficulty, query.minRating),
+      lte(problemVersions.difficulty, query.maxRating),
+      textFilter
+    ];
 
 
-// export async function searchProblems(query: SearchProblemsQuerySchema) {
+  const whereClause = and(...conditions);
 
 
-//   const searchText = query.query?.trim();
-
-//   const textFilter = searchText
-//     ? or(
-//       ilike(problemVersions.title, `%${searchText}%`),
-//       ilike(
-//         problems.slug,
-//         `%${searchText.replace(/\s+/g, "-")}%`,
-//       ),
-//     )
-//     : undefined;
-
-//   const conditions =
-//     [
-//       eq(problems.visibility, true),
-//       eq(problems.status, "PUBLISHED"),
-//       isNull(problems.deletedAt),
-//       eq(problemVersions.isActive, true),
-//       gte(problemVersions.difficulty, query.minRating),
-//       lte(problemVersions.difficulty, query.maxRating),
-//       textFilter
-//     ];
+  const [countResult] = await db.select({
+    totalItems: countDistinct(problems.id),
+  })
+    .from(problems).
+    innerJoin(problemVersions, eq(problemVersions.problemId, problems.id))
+    .where(whereClause);
 
 
-//   const whereClause = and(...conditions);
+  const totalItems = countResult?.totalItems ?? 0;
+  const offset = (query.pageNumber - 1) * query.pageSize;
+
+  const pageProblems = await db
+    .select({
+      id: problems.id,
+      slug: problems.slug,
+      title: problemVersions.title,
+      difficulty: problemVersions.difficulty,
+    })
+    .from(problems)
+    .innerJoin(
+      problemVersions,
+      eq(problems.id, problemVersions.problemId),
+    )
+    .where(whereClause)
+    .orderBy(
+      asc(problemVersions.title),
+      asc(problems.id),
+    )
+    .limit(query.pageSize)
+    .offset(offset);
 
 
-//   const [countResult] = await db.select({
-//     totalItems: countDistinct(problems.id),
-//   })
-//     .from(problems).
-//     innerJoin(problemVersions, eq(problemVersions.problemId, problems.id))
-//     .where(whereClause);
+  const totalPages = Math.ceil(totalItems / query.pageSize);
 
+  return {
+    problems: pageProblems,
+    pagination: {
+      totalItems,
+      totalPages,
+      currentPage: query.pageNumber,
+      pageSize: query.pageSize
+    }
+  };
+};
 
-//   const totalItems = countResult?.totalItems ?? 0;
-//   const offset = (query.pageNumber - 1) * query.pageSize;
-
-//   const pageProblems = await db
-//     .select({
-//       id: problems.id,
-//       slug: problems.slug,
-//       title: problemVersions.title,
-//       difficulty: problemVersions.difficulty,
-//     })
-//     .from(problems)
-//     .innerJoin(
-//       problemVersions,
-//       eq(problems.id, problemVersions.problemId),
-//     )
-//     .where(whereClause)
-//     .orderBy(
-//       asc(problemVersions.title),
-//       asc(problems.id),
-//     )
-//     .limit(query.pageSize)
-//     .offset(offset);
-
-// };
