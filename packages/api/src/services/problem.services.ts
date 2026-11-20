@@ -1,6 +1,6 @@
 import { db } from "../db/connection.ts";
 import { problems, problemVersions } from "../db/schema.ts";
-import { eq, and, or, isNull, gte, lte, ilike, countDistinct, asc } from "drizzle-orm";
+import { eq, and, or, isNull, gte, lte, ilike, countDistinct, asc, count } from "drizzle-orm";
 import { AppError } from "../utils/app-error.ts";
 import type { CreateProblemInput, ProblemIdParamSchema, SearchProblemsQuerySchema } from "../validators/problem.validators.ts";
 
@@ -144,7 +144,7 @@ export async function searchProblems(query: SearchProblemsQuerySchema) {
 
 
   const [countResult] = await db.select({
-    totalItems: countDistinct(problems.id),
+    totalItems: count(problems.id),
   })
     .from(problems).
     innerJoin(problemVersions, eq(problemVersions.problemId, problems.id))

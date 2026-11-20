@@ -73,7 +73,6 @@ export const problemVersions = pgTable('problem_versions', {
     checkerScriptS3Key: varchar('checker_script_s3_key', { length: 256 })
 
 
-
 }, (table) => [
     check('checker_stuff',
         sql

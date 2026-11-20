@@ -97,3 +97,6 @@ export async function getProblemByIdHandler(req: Request, res: Response, next: N
   }
 
 }; 
+
+
+// problem return is giving all the data from db, cut it .
